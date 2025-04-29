@@ -8,11 +8,11 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
-    DB_HOST: z.string(),
-    DB_DATABASE: z.string(),
-    DB_PORT: z.string(),
-    DB_USER: z.string(),
-    DB_PASS: z.string(),
+    DB_HOST: z.string().optional(),
+    DB_DATABASE: z.string().optional(),
+    DB_PORT: z.string().optional(),
+    DB_USER: z.string().optional(),
+    DB_PASS: z.string().optional(),
   },
 
   /**
