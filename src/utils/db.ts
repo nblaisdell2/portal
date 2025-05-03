@@ -1,5 +1,5 @@
 import type { QueryResultRow } from "pg";
-import { Client } from "pg";
+import { Pool } from "pg";
 import { env } from "../env";
 
 export function getConnection(isLocal: boolean) {
@@ -27,7 +27,7 @@ export function getConnection(isLocal: boolean) {
   }
 }
 
-export const client = new Client(getConnection(true));
+export const client = new Pool(getConnection(true));
 
 function getFunctionSQL(
   functionName: string,
@@ -50,12 +50,23 @@ function getProcedureSQL(
   return { sql: `CALL ${procedureName}(${paramList});`, params };
 }
 
+export async function querySQL<TResult extends QueryResultRow>(sql: string) {
+  const result = await client.query<TResult>(sql);
+  return result;
+}
+
 export async function query<TResult extends QueryResultRow>(
   functionName: string,
   ...functionParams: any[]
 ) {
   const { sql, params } = getFunctionSQL(functionName, ...functionParams);
-  const result = await client.query<TResult>(sql, params);
+  let result;
+  try {
+    result = await client.query<TResult>(sql, params);
+  } catch (ex) {
+    console.log(ex);
+  }
+
   return result;
 }
 

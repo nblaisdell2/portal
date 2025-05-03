@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { query, querySQL } from "~/utils/db";
 
 // Mocked DB
 interface Post {
@@ -22,6 +23,11 @@ export const postRouter = createTRPCRouter({
         greeting: `Hello ${input.text}`,
       };
     }),
+
+  getUsers: publicProcedure.query(async () => {
+    const data = await query("portal.get_users");
+    return data?.rows;
+  }),
 
   create: publicProcedure
     .input(z.object({ name: z.string().min(1) }))
