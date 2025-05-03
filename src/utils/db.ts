@@ -27,7 +27,7 @@ export function getConnection(isLocal: boolean) {
   }
 }
 
-export const client = new Pool(getConnection(true));
+export const client = new Pool(getConnection(false));
 
 function getFunctionSQL(
   functionName: string,
