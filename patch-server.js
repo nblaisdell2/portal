@@ -11,10 +11,10 @@ let serverJs = fs.readFileSync(serverJsPath, "utf8");
 const injectCode = `
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 
-const client = new SecretsManagerClient({ region: process.env.AWS_REGION || "us-east-1" });
+const client = new SecretsManagerClient({ region: "us-east-1" });
 
 async function loadSecrets() {
-  const command = new GetSecretValueCommand({ SecretId: "fastify-ts/secret12" });
+  const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
   const response = await client.send(command);
   const secrets = JSON.parse(response.SecretString);
   for (const [key, value] of Object.entries(secrets)) {
