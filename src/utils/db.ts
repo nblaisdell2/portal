@@ -35,7 +35,7 @@ async function downloadPemIfNeeded(): Promise<void> {
   fs.writeFileSync(pemFilePath, pemContent);
 }
 
-export async function getConnection() {
+async function getConnection() {
   if (env.NODE_ENV == "development") {
     return {
       host: env.DB_HOST as string,
@@ -61,8 +61,15 @@ export async function getConnection() {
   }
 }
 
-const dbConn = await getConnection();
-export const client = new Pool(dbConn);
+let pool: Pool;
+
+async function getConnectionPool() {
+  if (!pool) {
+    const dbConn = await getConnection();
+    pool = new Pool(dbConn);
+  }
+  return pool;
+}
 
 function getFunctionSQL(
   functionName: string,
@@ -86,7 +93,8 @@ function getProcedureSQL(
 }
 
 export async function querySQL<TResult extends QueryResultRow>(sql: string) {
-  const result = await client.query<TResult>(sql);
+  const conn = await getConnectionPool();
+  const result = await conn.query<TResult>(sql);
   return result;
 }
 
@@ -97,7 +105,8 @@ export async function query<TResult extends QueryResultRow>(
   const { sql, params } = getFunctionSQL(functionName, ...functionParams);
   let result;
   try {
-    result = await client.query<TResult>(sql, params);
+    const conn = await getConnectionPool();
+    result = await conn.query<TResult>(sql, params);
   } catch (ex) {
     console.log(ex);
   }
@@ -110,6 +119,7 @@ export async function exec<TResult extends QueryResultRow>(
   ...procParams: any[]
 ) {
   const { sql, params } = getProcedureSQL(procName, ...procParams);
-  const result = await client.query<TResult>(sql, params);
+  const conn = await getConnectionPool();
+  const result = await conn.query<TResult>(sql, params);
   return result;
 }
