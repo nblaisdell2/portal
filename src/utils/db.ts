@@ -1,34 +1,68 @@
 import type { QueryResultRow } from "pg";
 import { Pool } from "pg";
 import { env } from "../env";
+import fs from "fs";
 
-export function getConnection(isLocal: boolean) {
-  // if (isLocal) {
-  //   return {
-  //     host: env.DB_HOST as string,
-  //     database: env.DB_DATABASE as string,
-  //     port: env.DB_PORT as unknown as number,
-  //     user: env.DB_USER as string,
-  //     password: env.DB_PASS as string,
-  //   };
-  // } else {
-  return {
-    host: env.DB_HOST as string,
-    database: env.DB_DATABASE as string,
-    port: env.DB_PORT as unknown as number,
-    user: env.DB_USER as string,
-    password: env.DB_PASS as string,
-    // TODO: Figure out SSL issues for Production
-    //       https://stackoverflow.com/questions/76899023/rds-while-connection-error-no-pg-hba-conf-entry-for-host
-    ssl: false,
-    // ssl: {
-    //   rejectUnauthorized: false,
-    // },
-  };
-  // }
+import path from "path";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { Readable } from "stream";
+
+const pemFilePath = path.join("/tmp", "rds-combined-ca-bundle.pem");
+
+async function downloadPemIfNeeded(): Promise<void> {
+  // Already downloaded
+  if (fs.existsSync(pemFilePath)) {
+    return;
+  }
+
+  const s3 = new S3Client({ region: env.AWS_REGION });
+  const command = new GetObjectCommand({
+    Bucket: env.SSL_PEM_BUCKET,
+    Key: env.SSL_PEM_KEY,
+  });
+
+  const response = await s3.send(command);
+
+  const streamToString = (stream: Readable): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const chunks: any[] = [];
+      stream.on("data", (chunk) => chunks.push(chunk));
+      stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+      stream.on("error", reject);
+    });
+
+  const pemContent = await streamToString(response.Body as Readable);
+  fs.writeFileSync(pemFilePath, pemContent);
 }
 
-export const client = new Pool(getConnection(true));
+export async function getConnection() {
+  if (env.NODE_ENV == "development") {
+    return {
+      host: env.DB_HOST as string,
+      database: env.DB_DATABASE as string,
+      port: env.DB_PORT as unknown as number,
+      user: env.DB_USER as string,
+      password: env.DB_PASS as string,
+    };
+  } else {
+    await downloadPemIfNeeded();
+    return {
+      host: env.DB_HOST as string,
+      database: env.DB_DATABASE as string,
+      port: env.DB_PORT as unknown as number,
+      user: env.DB_USER as string,
+      password: env.DB_PASS as string,
+      ssl: {
+        require: true,
+        rejectUnauthorized: true,
+        ca: fs.readFileSync(pemFilePath).toString(),
+      },
+    };
+  }
+}
+
+const dbConn = await getConnection();
+export const client = new Pool(dbConn);
 
 function getFunctionSQL(
   functionName: string,

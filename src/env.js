@@ -13,6 +13,9 @@ export const env = createEnv({
     DB_PORT: z.string().optional(),
     DB_USER: z.string().optional(),
     DB_PASS: z.string().optional(),
+    AWS_REGION: z.string().optional(),
+    SSL_PEM_BUCKET: z.string().optional(),
+    SSL_PEM_KEY: z.string().optional(),
   },
 
   /**
@@ -36,6 +39,9 @@ export const env = createEnv({
     DB_PORT: process.env.DB_PORT,
     DB_USER: process.env.DB_USER,
     DB_PASS: process.env.DB_PASS,
+    AWS_REGION: process.env.AWS_REGION,
+    SSL_PEM_BUCKET: process.env.SSL_PEM_BUCKET,
+    SSL_PEM_KEY: process.env.SSL_PEM_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
