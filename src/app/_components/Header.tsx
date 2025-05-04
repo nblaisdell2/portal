@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 
-const Navbar = () => {
+const Header = () => {
   return (
     <nav className="bg-[#E8EEF2] px-8 py-4 top-0 flex gap-9 items-center relative h-full shadow-sm shadow-gray-400">
       {/* Logo/Home link */}
@@ -34,4 +34,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Header;

@@ -9,3 +9,4 @@ README.md
 
 # Terraform
 .terraform/
+.env.prod

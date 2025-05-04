@@ -4,7 +4,7 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import Navbar from "./_components/Navbar";
+import Header from "./_components/Header";
 import Footer from "./_components/Footer";
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body className="flex flex-col bg-[#E8EEF2] min-h-screen">
-        <Navbar />
+        <Header />
         <div className="flex-grow">
           <TRPCReactProvider>{children}</TRPCReactProvider>
         </div>

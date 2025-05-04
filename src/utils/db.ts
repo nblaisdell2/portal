@@ -3,31 +3,32 @@ import { Pool } from "pg";
 import { env } from "../env";
 
 export function getConnection(isLocal: boolean) {
-  if (isLocal) {
-    return {
-      host: env.DB_HOST as string,
-      database: env.DB_DATABASE as string,
-      port: env.DB_PORT as unknown as number,
-      user: env.DB_USER as string,
-      password: env.DB_PASS as string,
-    };
-  } else {
-    return {
-      host: env.DB_HOST as string,
-      database: env.DB_DATABASE as string,
-      port: env.DB_PORT as unknown as number,
-      user: env.DB_USER as string,
-      password: env.DB_PASS as string,
-      // TODO: Figure out SSL issues for Production
-      //       https://stackoverflow.com/questions/76899023/rds-while-connection-error-no-pg-hba-conf-entry-for-host
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    };
-  }
+  // if (isLocal) {
+  //   return {
+  //     host: env.DB_HOST as string,
+  //     database: env.DB_DATABASE as string,
+  //     port: env.DB_PORT as unknown as number,
+  //     user: env.DB_USER as string,
+  //     password: env.DB_PASS as string,
+  //   };
+  // } else {
+  return {
+    host: env.DB_HOST as string,
+    database: env.DB_DATABASE as string,
+    port: env.DB_PORT as unknown as number,
+    user: env.DB_USER as string,
+    password: env.DB_PASS as string,
+    // TODO: Figure out SSL issues for Production
+    //       https://stackoverflow.com/questions/76899023/rds-while-connection-error-no-pg-hba-conf-entry-for-host
+    ssl: false,
+    // ssl: {
+    //   rejectUnauthorized: false,
+    // },
+  };
+  // }
 }
 
-export const client = new Pool(getConnection(false));
+export const client = new Pool(getConnection(true));
 
 function getFunctionSQL(
   functionName: string,
