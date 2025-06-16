@@ -59,7 +59,7 @@ const MyLineChart = () => {
 
   return (
     <div
-      className="flex flex-col w-full p-4"
+      className="flex flex-col min-w-[250px] w-full p-4"
       onMouseEnter={() => {
         setShowOptions(true);
       }}
