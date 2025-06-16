@@ -15,7 +15,7 @@ async function downloadPemIfNeeded(): Promise<void> {
     return;
   }
 
-  const s3 = new S3Client({ region: env.AWS_REGION || "us-east-1" });
+  const s3 = new S3Client({ region: env.AWS_REGION });
   const command = new GetObjectCommand({
     Bucket: env.SSL_PEM_BUCKET,
     Key: env.SSL_PEM_KEY,

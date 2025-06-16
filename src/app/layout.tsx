@@ -23,7 +23,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable}`}>
-      <body className="flex flex-col bg-[#E8EEF2] min-h-screen">
+      <body className="flex flex-col bg-white min-h-screen">
         <Header />
         <div className="flex-grow">
           <TRPCReactProvider>{children}</TRPCReactProvider>
