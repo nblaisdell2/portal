@@ -6,13 +6,16 @@ type Props = {
 };
 
 function Widget({ width }: Props) {
-  const twWidth = width == "100%" ? "w-full" : `w-[${width}]`;
-  console.log(`my-6 ${width == "100%" ? "w-full" : twWidth}`);
-  return (
-    <div className={`my-6 ${twWidth}`}>
-      <MyLineChart />
-    </div>
-  );
+  const comp = <MyLineChart />;
+  return width == "100%" ? (
+    <div className={`my-6 w-full`}>{comp}</div>
+  ) : width == "25%" ? (
+    <div className={`my-6 w-[25%]`}>{comp}</div>
+  ) : width == "50%" ? (
+    <div className={`my-6 w-[50%]`}>{comp}</div>
+  ) : width == "75%" ? (
+    <div className={`my-6 w-[75%]`}>{comp}</div>
+  ) : null;
 }
 
 export default Widget;
